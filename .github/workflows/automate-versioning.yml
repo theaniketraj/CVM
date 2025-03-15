@@ -15,8 +15,8 @@ jobs:
               with: 
                   persist-credentials: true
             
-            - name: Set Gradle Permissions
-              run: chmod +x ./gradlew  # Ensure gradlew has execute permissions
+            # - name: Set Gradle Permissions
+            #   run: chmod +x ./gradlew  # Ensure gradlew has execute permissions
 
             - name: Set up Java & Gradle
               uses: actions/setup-java@v3
