@@ -20,15 +20,18 @@ The **Custom Versioning Model (CVM)** is a lightweight, Gradle-based tool that a
 ### Installation
 
 1. **Clone the Repository:**
+   
    ```bash
    git clone https://github.com/<your-username>/CVM.git
    cd CVM
    ```
 2. **Configure the gradle Wrapper:** Ensure that your ```gradle/wrapper/gradle-wrapper.properties``` file points to a valid Gradle version:
+   
    ```properties
    distributionUrl=https\://services.gradle.org/distributions/gradle-8.12.0-all.zip
    ```
 3. **Set Up Version Properties:** Create a ```version.properties``` file in the project root with initial values:
+   
     ```properties
     VERSION_MAJOR=1
     VERSION_MINOR=0
@@ -37,36 +40,44 @@ The **Custom Versioning Model (CVM)** is a lightweight, Gradle-based tool that a
     ```
 
 ### Usage
+
 **Incrementing the Version**
 To automatically increment the build number and update version information, run the following Gradle task:
-    ```bash
-    ./gradlew incrementVersion
-    ```
+   ```bash
+   ./gradlew incrementVersion
+   ```
+    
 This task:
-🔹Reads the current version data from ```version.properties```
-🔹Increments the ```BUILD_NUMBER```
-🔹Optionally updates the major, minor, or patch numbers if a corresponding release trigger file (e.g., ```RELEASE_MAJOR```, ```RELEASE_MINOR```, or ```RELEASE_PATCH```) exists
-🔹Writes the updated version information back to ```version.properties```
+
+- **Reads the current version data from** ```version.properties```
+- **Increments the** ```BUILD_NUMBER```
+- **Optionally updates the major, minor, or patch numbers if a corresponding release trigger file** (e.g., ```RELEASE_MAJOR```, ```RELEASE_MINOR```, or ```RELEASE_PATCH```) exists
+- **Writes the updated version information back to** ```version.properties```
 
 **Viewing the Current Version**
-A dedicated task is available to display the current version:
-    ```bash
-    ./gradlew showVersion
-    ```
 
-**Integration with (CEIE)[https://github.com/theaniketraj/ceie]**
+A dedicated task is available to display the current version:
+   ```bash
+   ./gradle showVersion
+   ```
+
+**Integration with [CEIE](https://github.com/theaniketraj/ceie)**
+
 CVM is planned to be integrated into CEIE as a core component. This integration will streamline version management across CEIE projects by automating version and build number updates seamlessly.
 
 **Roadmap**
-🔹Enhanced Testing: Continuous testing across multiple environments.
-🔹Expanded Documentation: More detailed guides and configuration options.
-🔹CEIE Integration: Full integration of CVM into the CEIE ecosystem.
+
+- **Enhanced Testing:** Continuous testing across multiple environments.
+- **Expanded Documentation:** More detailed guides and configuration options.
+- **CEIE Integration:** Full integration of CVM into the CEIE ecosystem.
 
 **Contributing**
+
 Contributions are welcome! If you'd like to contribute improvements or fixes:
-1. Fork the repository.
-2. Create a new branch for your feature or bugfix.
-3. Submit a pull request with your changes.
+
+- **Fork the repository**.
+- **Create a new branch for your feature or bugfix.**
+- **Submit a pull request with your changes.**
 
 **License**
-This project is licensed under the (MIT License)[]
+This project is licensed under the [MIT License](https://github.com/theaniketraj/CVM/blob/main/LICENSE)
