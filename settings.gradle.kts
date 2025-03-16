@@ -5,21 +5,22 @@ pluginManagement {
                 includeGroupByRegex("com\\.android.*")
                 includeGroupByRegex("com\\.google.*")
                 includeGroupByRegex("androidx.*")
-                include(":versioning")
             }
         }
         mavenCentral()
+        mavenLocal()
         gradlePluginPortal()
     }
 }
+
+// Include custom module only if it exists as a separate module
+include(":app")
+include(":versioning") // If `VersioningPlugin` is separate, otherwise remove this.
+rootProject.name = "CVM"
+
 dependencyResolutionManagement {
-//    repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS)
     repositories {
         google()
         mavenCentral()
     }
 }
-
-rootProject.name = "CVM"
-include(":app")
- 

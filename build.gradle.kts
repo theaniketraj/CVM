@@ -2,9 +2,9 @@
 plugins {
     alias(libs.plugins.android.application) apply false
     alias(libs.plugins.kotlin.android) apply false
-    kotlin("jvm") version "1.8.22" apply false // Ensure proper application of Kotlin JVM
 }
 
+// Repository Configuration
 allprojects {
     repositories {
         google()
@@ -12,21 +12,31 @@ allprojects {
     }
 }
 
+// Version Increment Task
 tasks.register("incrementVersion") {
     doLast {
         val versionFile = file("version.properties")
+
+        if (!versionFile.exists()) {
+            println("❌ version.properties file not found! Skipping version increment.")
+            return@doLast
+        }
+
         val properties = java.util.Properties().apply {
-            load(versionFile.inputStream())
+            versionFile.inputStream().use { load(it) }
         }
 
-        val oldBuild = properties["build"]?.toString()?.toInt() ?: 0
+        val oldBuild = properties["BUILD_NUMBER"]?.toString()?.toIntOrNull() ?: 0
         val newBuild = oldBuild + 1
-        properties["build"] = newBuild.toString()
-        versionFile.writer().use { writer ->
-            properties.store(writer, null)
-        }
 
-        println("Build incremented: $oldBuild -> $newBuild")
+        properties["BUILD_NUMBER"] = newBuild.toString()
+        versionFile.writer().use { properties.store(it, null) }
+
+        println("✅ Build number incremented: $oldBuild → $newBuild")
     }
-} 
+}
 
+// Ensure version increment happens before build
+tasks.named("assemble") {
+    dependsOn("incrementVersion")
+}
