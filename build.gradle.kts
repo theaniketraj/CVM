@@ -1,10 +1,11 @@
 // Top-level build file where you can add configuration options common to all sub-projects/modules.
 plugins {
-    alias(libs.plugins.android.application) apply false
-    alias(libs.plugins.kotlin.android) apply false
+    id("com.android.application") apply false
+    id("org.jetbrains.kotlin.android") apply false
+    // We no longer need the Kotlin JVM plugin here
+    // id("com.example.cvm.versioning") version "1.0.0" apply false // Custom plugin is now in buildSrc
 }
 
-// Repository Configuration
 allprojects {
     repositories {
         google()
@@ -12,31 +13,26 @@ allprojects {
     }
 }
 
-// Version Increment Task
+// Increment version task to update version.properties
 tasks.register("incrementVersion") {
     doLast {
         val versionFile = file("version.properties")
-
         if (!versionFile.exists()) {
-            println("❌ version.properties file not found! Skipping version increment.")
+            println("⚠️ version.properties not found! Skipping version increment.")
             return@doLast
         }
-
-        val properties = java.util.Properties().apply {
-            versionFile.inputStream().use { load(it) }
-        }
-
-        val oldBuild = properties["BUILD_NUMBER"]?.toString()?.toIntOrNull() ?: 0
+        val properties = java.util.Properties().apply { load(versionFile.inputStream()) }
+        val oldBuild = properties.getProperty("BUILD_NUMBER", "0").toIntOrNull() ?: 0
         val newBuild = oldBuild + 1
-
-        properties["BUILD_NUMBER"] = newBuild.toString()
-        versionFile.writer().use { properties.store(it, null) }
-
-        println("✅ Build number incremented: $oldBuild → $newBuild")
+        properties.setProperty("BUILD_NUMBER", newBuild.toString())
+        versionFile.bufferedWriter().use { properties.store(it, null) }
+        println("✅ Build incremented: $oldBuild → $newBuild")
     }
 }
 
-// Ensure version increment happens before build
-tasks.named("assemble") {
-    dependsOn("incrementVersion")
+// Optionally, if you want this to run for each subproject, you could do:
+subprojects {
+    tasks.matching { it.name == "assemble" }.configureEach {
+        dependsOn(rootProject.tasks.named("incrementVersion"))
+    }
 }

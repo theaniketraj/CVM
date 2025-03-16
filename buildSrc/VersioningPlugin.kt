@@ -10,24 +10,19 @@ class VersioningPlugin : Plugin<Project> {
         target.tasks.register("incrementVersion") {
             doLast {
                 val versionFile = File(target.rootDir, "version.properties")
-                
                 if (!versionFile.exists()) {
-                    println("❌ version.properties not found!")
+                    println("⚠️ version.properties not found in ${target.rootDir.absolutePath}")
                     return@doLast
                 }
-
                 val properties = Properties().apply { 
-                    versionFile.inputStream().use { load(it) } 
+                    versionFile.inputStream().use { load(it) }
                 }
-
-                // Read and increment build number
                 val buildNumber = properties.getProperty("BUILD_NUMBER", "0").toInt() + 1
-                properties["BUILD_NUMBER"] = buildNumber.toString()
-
-                // Save back to file
-                versionFile.writer().use { properties.store(it, null) }
-
-                println("✅ Build number updated to: $buildNumber")
+                properties.setProperty("BUILD_NUMBER", buildNumber.toString())
+                versionFile.bufferedWriter().use { writer ->
+                    properties.store(writer, null)
+                }
+                println("✅ Updated build number to: $buildNumber")
             }
         }
     }

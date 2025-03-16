@@ -2,8 +2,7 @@ name: Automate Versioning
 
 on:
   push:
-    branches:
-      - main
+    branches: [ main ]
 
 jobs:
   versioning:
@@ -13,7 +12,7 @@ jobs:
       - name: Checkout Repository
         uses: actions/checkout@v4
         with:
-          persist-credentials: false  # Disable default GitHub token
+          persist-credentials: false
 
       - name: Set up Git
         run: |
@@ -22,17 +21,21 @@ jobs:
           git remote set-url origin https://theaniketraj:${{ secrets.GH_PAT }}@github.com/theaniketraj/CVM.git
           git remote -v
 
-      - name: Grant Execute Permission to Gradlew  # **Fix for Permission Error**
-        run: chmod +x ./gradlew  
+      - name: Set up Java & Gradle
+        uses: actions/setup-java@v3
+        with:
+          distribution: 'temurin'
+          java-version: '17'
 
-      - name: Increment Version
+      - name: Grant Execute Permission to Gradlew
+        run: chmod +x ./gradlew
+
+      - name: Run Increment Version Task
         run: ./gradlew incrementVersion
 
       - name: Commit & Push Version Update
         run: |
           git add version.properties
           git commit -m "🔄 Auto-increment version [skip ci]"
-          git stash --include-untracked
           git pull --rebase origin main
-          git stash pop || echo "No stashed changes to apply"
-          git push origin
+          git push origin main

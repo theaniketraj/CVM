@@ -4,16 +4,16 @@ import java.util.Properties
 plugins {
     id("com.android.application")
     id("org.jetbrains.kotlin.android")
-    id("com.example.cvm.versioning") // Apply custom versioning plugin
+    id("com.example.cvm.versioning") // Our custom plugin, available via buildSrc
 }
 
-// Load version properties dynamically
+// Load version properties from the root directory
 val versionProps = Properties().apply {
     val versionFile = File(rootProject.projectDir, "version.properties")
     if (versionFile.exists()) {
         versionFile.inputStream().use { load(it) }
     } else {
-        println("⚠️ Warning: version.properties file is missing. Using default values.")
+        println("⚠️ Warning: version.properties not found. Using default values.")
         setProperty("BUILD_NUMBER", "1")
         setProperty("VERSION_MAJOR", "1")
         setProperty("VERSION_MINOR", "0")
@@ -21,18 +21,19 @@ val versionProps = Properties().apply {
     }
 }
 
-// Read version values safely
 val versionCode = versionProps.getProperty("BUILD_NUMBER", "1").toInt()
-val versionName = "${versionProps.getProperty("VERSION_MAJOR", "1")}.${versionProps.getProperty("VERSION_MINOR", "0")}.${versionProps.getProperty("VERSION_PATCH", "0")}"
+val versionName = "${versionProps.getProperty("VERSION_MAJOR", "1")}" +
+                  ".${versionProps.getProperty("VERSION_MINOR", "0")}" +
+                  ".${versionProps.getProperty("VERSION_PATCH", "0")}"
 
 android {
     namespace = "com.example.cvm"
-    compileSdk = 34 // Use the latest stable version
+    compileSdk = 34
 
     defaultConfig {
         applicationId = "com.example.cvm"
         minSdk = 24
-        targetSdk = 34 // Match compileSdk for best compatibility
+        targetSdk = 34
         this.versionCode = versionCode
         this.versionName = versionName
 
@@ -59,7 +60,7 @@ android {
     }
 }
 
-// Task to display the current version
+// Task to show the version (for debugging)
 tasks.register("showVersion") {
     doLast {
         println("Current Version: $versionName (Build: $versionCode)")

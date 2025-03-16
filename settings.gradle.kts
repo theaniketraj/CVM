@@ -13,10 +13,10 @@ pluginManagement {
     }
 }
 
-// Include custom module only if it exists as a separate module
-include(":app")
-include(":versioning") // If `VersioningPlugin` is separate, otherwise remove this.
 rootProject.name = "CVM"
+include(":app")
+// Uncomment the following if you have a separate module for versioning (otherwise, the plugin is in buildSrc)
+// include(":versioning")
 
 dependencyResolutionManagement {
     repositories {
