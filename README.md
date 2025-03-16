@@ -22,7 +22,7 @@ The **Custom Versioning Model (CVM)** is a lightweight, Gradle-based tool that a
 1. **Clone the Repository:**
    
    ```bash
-   git clone https://github.com/<your-username>/CVM.git
+   git clone https://github.com/theaniketraj/CVM.git
    cd CVM
    ```
 2. **Configure the gradle Wrapper:** Ensure that your ```gradle/wrapper/gradle-wrapper.properties``` file points to a valid Gradle version:
