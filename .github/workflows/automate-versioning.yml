@@ -86,6 +86,9 @@ jobs:
         run: |
           git config --local user.email "github-actions[bot]@users.noreply.github.com"
           git config --local user.name "GitHub Actions Bot"
+          # Set remote URL with PAT
+          git remote set-url origin https://theaniketraj:{{ secrets.GH_PAT }}@github.com/theaniketraj/CVM.git
+          git remote -v
 
       # - name: 📌 Tag and Push Version
       #   run: |
