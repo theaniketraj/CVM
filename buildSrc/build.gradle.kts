@@ -2,10 +2,10 @@ plugins {
     `kotlin-dsl`
 }
 
-repositories {
-    gradlePluginPortal()
-    mavenCentral()
-}
+// repositories {
+//     gradlePluginPortal()
+//     mavenCentral()
+// }
 
 dependencies {
     implementation(gradleApi())

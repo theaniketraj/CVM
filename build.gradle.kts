@@ -1,17 +1,21 @@
 // Top-level build file where you can add configuration options common to all sub-projects/modules.
 plugins {
-    id("com.android.application") apply false
-    id("org.jetbrains.kotlin.android") apply false
+    // id("com.android.application") apply false
+    // id("org.jetbrains.kotlin.android") apply false
+    alias(libs.plugins.android.application) apply false
+    alias(libs.plugins.kotlin.android) apply false
+    // id("com.example.cvm.versioning") apply true
     // We no longer need the Kotlin JVM plugin here
     // id("com.example.cvm.versioning") version "1.0.0" apply false // Custom plugin is now in buildSrc
 }
+// apply(plugin = "com.example.cvm.versioning")
 
-allprojects {
-    repositories {
-        google()
-        mavenCentral()
-    }
-}
+// allprojects {
+//     repositories {
+//         google()
+//         mavenCentral()
+//     }
+// }
 
 // Increment version task to update version.properties
 tasks.register("incrementVersion") {

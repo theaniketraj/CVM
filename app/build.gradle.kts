@@ -4,7 +4,7 @@ import java.util.Properties
 plugins {
     id("com.android.application")
     id("org.jetbrains.kotlin.android")
-    id("com.example.cvm.versioning") // Our custom plugin, available via buildSrc
+    // id("com.example.cvm.versioning") // Our custom plugin, available via buildSrc
 }
 
 // Load version properties from the root directory
@@ -27,13 +27,16 @@ val versionName = "${versionProps.getProperty("VERSION_MAJOR", "1")}" +
                   ".${versionProps.getProperty("VERSION_PATCH", "0")}"
 
 android {
+    lintOptions {
+        disable("UnusedResources")
+    }
     namespace = "com.example.cvm"
-    compileSdk = 34
+    compileSdk = 35
 
     defaultConfig {
         applicationId = "com.example.cvm"
         minSdk = 24
-        targetSdk = 34
+        targetSdk = 35
         this.versionCode = versionCode
         this.versionName = versionName
 
