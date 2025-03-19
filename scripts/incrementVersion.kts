@@ -1,4 +1,5 @@
 // Test comment
+
 #!/usr/bin/env kotlin
 
 import java.io.File
@@ -14,9 +15,14 @@ if (!versionFile.exists()) {
 }
 
 // Create a backup before making any changes
-versionFile.copyTo(backupFile, overwrite = true)
+try {
+    versionFile.copyTo(backupFile, overwrite = true)
+    println("✅ Backup created: ${backupFile.absolutePath}")
+} catch (e: Exception) {
+    println("❌ ERROR: Failed to create backup. Exiting...")
+    System.exit(1)
+}
 
-println("✅ Backup created: ${backupFile.absolutePath}")
 val VERSION_FILE = "version.properties"
 val BACKUP_FILE = "version_backup.properties"
 val MAJOR_KEY = "VERSION_MAJOR"
@@ -51,17 +57,35 @@ fun backupVersion() {
 }
 
 // Restore the previous version in case of rollback
-fun rollbackVersion() {
+// fun rollbackVersion() {
+//     val backupFile = File("version_backup.properties")
+//     val versionFile = File("version.properties")
+
+//     if (!backupFile.exists()) {
+//         println("⚠️ No backup file found. Cannot rollback!")
+//         return
+//     }
+
+//     backupFile.copyTo(versionFile, overwrite = true)
+//     println("🔄 Rollback successful: Restored previous version")
+// }
+
+fun rollbackChanges() {
     val backupFile = File("version_backup.properties")
     val versionFile = File("version.properties")
 
     if (!backupFile.exists()) {
-        println("⚠️ No backup file found. Cannot rollback!")
+        println("⚠️ ERROR: No backup file found! Rollback not possible.")
         return
     }
 
-    backupFile.copyTo(versionFile, overwrite = true)
-    println("🔄 Rollback successful: Restored previous version")
+    try {
+        backupFile.copyTo(versionFile, overwrite = true)
+        println("🔄 Rollback successful: Previous version restored.")
+    } catch (e: Exception) {
+        println("❌ ERROR: Failed to restore backup!")
+        e.printStackTrace()
+    }
 }
 
 // Retrieve the latest Git tag or default to "v0.0.0"
