@@ -68,7 +68,7 @@ jobs:
           cache: gradle
 
       - name: 🛠️ Make `incrementVersion.kts` Executable
-        run: chmod +x ./scripts/incrementVersion.kts
+        run: chmod +x scripts/incrementVersion.kts
 
       - name: 🔥 Run Version Increment Script
         run: ./scripts/incrementVersion.kts
