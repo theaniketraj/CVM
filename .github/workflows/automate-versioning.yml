@@ -36,6 +36,8 @@ jobs:
       - name: Commit & Push Version Update
         run: |
           git add version.properties
-          git commit -m "🔄 Auto-increment version [skip ci]"
+          git commit -m "🔄 Auto-increment version [skip ci]" || echo "Nothing to commit"
+          git stash --include-untracked
           git pull --rebase origin main
+          git stash pop || echo "No stashed changes to apply"
           git push origin main
