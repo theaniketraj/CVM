@@ -67,11 +67,11 @@ jobs:
           distribution: 'temurin'
           cache: gradle
 
-      - name: 🛠️ Make `incrementVersion.kts` Executable
-        run: chmod +x scripts/incrementVersion.kts
+      # - name: 🛠️ Make `incrementVersion.kts` Executable
+        # run: chmod +x scripts/incrementVersion.kts
 
-      - name: 🔥 Run Version Increment Script
-        run: ./scripts/incrementVersion.kts
+      # - name: 🔥 Run Version Increment Script
+        # run: kotlin -script scripts/incrementVersion.kts
 
       - name: 🚀 Configure Git
         run: |

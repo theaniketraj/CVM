@@ -1,3 +1,5 @@
+#!/usr/bin/env kotlin
+
 package com.example.cvm
 
 import org.gradle.api.Plugin
