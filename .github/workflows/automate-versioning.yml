@@ -55,6 +55,12 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+      -  name: Checkout Repository
+         uses: actions/checkout@v4
+         with:
+           fetch-depth: 0
+
+
       - name: 🛠️ Checkout Code
         uses: actions/checkout@v4
         with:
@@ -81,18 +87,39 @@ jobs:
           git config --local user.email "github-actions[bot]@users.noreply.github.com"
           git config --local user.name "GitHub Actions Bot"
 
+      # - name: 📌 Tag and Push Version
+      #   run: |
+      #     NEW_TAG=$(grep 'VERSION_MAJOR' version.properties | cut -d'=' -f2).$(grep 'VERSION_MINOR' version.properties | cut -d'=' -f2).$(grep 'VERSION_PATCH' version.properties | cut -d'=' -f2)
+      #     echo "New tag: v$NEW_TAG"
+      #     git add version.properties
+      #     if ! git diff --cached --quiet; then
+      #         git commit -m "🔄 Auto-increment version to $NEW_TAG"
+      #     else
+      #         echo "No changes to commit."
+      #     fi
+      #     # Create tag, ignoring errors if tag already exists
+      #     git tag "v$NEW_TAG" || echo "Tag v$NEW_TAG already exists."
+      #     # Push commits and tags, ignoring errors if there's nothing new to push
+      #     git push origin main --tags || echo "Nothing to push."
+
       - name: 📌 Tag and Push Version
         run: |
+          # Extract version numbers from version.properties to form a tag
           NEW_TAG=$(grep 'VERSION_MAJOR' version.properties | cut -d'=' -f2).$(grep 'VERSION_MINOR' version.properties | cut -d'=' -f2).$(grep 'VERSION_PATCH' version.properties | cut -d'=' -f2)
-          echo "New tag: v$NEW_TAG"
+          echo "New version tag will be: v$NEW_TAG"
+          
+          # Stage changes
           git add version.properties
+          
+          # Commit if there are changes
           if ! git diff --cached --quiet; then
-              git commit -m "🔄 Auto-increment version to $NEW_TAG"
+            git commit -m "🔄 Auto-increment version to v$NEW_TAG [skip ci]"
           else
-              echo "No changes to commit."
+            echo "No changes to commit."
           fi
-          # Create tag, ignoring errors if tag already exists
+          
+          # Tag the commit (if tag already exists, ignore the error)
           git tag "v$NEW_TAG" || echo "Tag v$NEW_TAG already exists."
-          # Push commits and tags, ignoring errors if there's nothing new to push
-          git push origin main --tags || echo "Nothing to push."
-
+          
+          # Push commits and tags
+          git push origin main --tags || echo "Nothing new to push."
