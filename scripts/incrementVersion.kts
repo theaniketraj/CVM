@@ -1,9 +1,22 @@
-// Test comment for main branch
+// Test comment
 #!/usr/bin/env kotlin
 
 import java.io.File
 import java.util.Properties
 
+val versionFile = File("version.properties")
+val backupFile = File("version_backup.properties")
+
+// Check if version.properties exists before proceeding
+if (!versionFile.exists()) {
+    println("🚨 version.properties file is missing! Exiting...")
+    System.exit(1)
+}
+
+// Create a backup before making any changes
+versionFile.copyTo(backupFile, overwrite = true)
+
+println("✅ Backup created: ${backupFile.absolutePath}")
 val VERSION_FILE = "version.properties"
 val BACKUP_FILE = "version_backup.properties"
 val MAJOR_KEY = "VERSION_MAJOR"
@@ -39,15 +52,16 @@ fun backupVersion() {
 
 // Restore the previous version in case of rollback
 fun rollbackVersion() {
-    val backupFile = File(BACKUP_FILE)
-    val versionFile = File(VERSION_FILE)
+    val backupFile = File("version_backup.properties")
+    val versionFile = File("version.properties")
 
-    if (backupFile.exists()) {
-        backupFile.copyTo(versionFile, overwrite = true)
-        println("🔄 Rollback successful: Restored from backup.")
-    } else {
-        println("❌ No backup file found. Rollback failed.")
+    if (!backupFile.exists()) {
+        println("⚠️ No backup file found. Cannot rollback!")
+        return
     }
+
+    backupFile.copyTo(versionFile, overwrite = true)
+    println("🔄 Rollback successful: Restored previous version")
 }
 
 // Retrieve the latest Git tag or default to "v0.0.0"
