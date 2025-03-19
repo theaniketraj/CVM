@@ -3,8 +3,8 @@
 import java.io.File
 import java.util.Properties
 
-// Use regular val instead of const val in scripts
 val VERSION_FILE = "version.properties"
+val BACKUP_FILE = "version_backup.properties"
 val MAJOR_KEY = "VERSION_MAJOR"
 val MINOR_KEY = "VERSION_MINOR"
 val PATCH_KEY = "VERSION_PATCH"
@@ -23,6 +23,32 @@ fun runCommand(command: String): String? {
     }
 }
 
+// Backup the current version before updating
+fun backupVersion() {
+    val versionFile = File(VERSION_FILE)
+    val backupFile = File(BACKUP_FILE)
+
+    if (versionFile.exists()) {
+        versionFile.copyTo(backupFile, overwrite = true)
+        println("✅ Backup created: $BACKUP_FILE")
+    } else {
+        println("⚠️ No version.properties file found to backup.")
+    }
+}
+
+// Restore the previous version in case of rollback
+fun rollbackVersion() {
+    val backupFile = File(BACKUP_FILE)
+    val versionFile = File(VERSION_FILE)
+
+    if (backupFile.exists()) {
+        backupFile.copyTo(versionFile, overwrite = true)
+        println("🔄 Rollback successful: Restored from backup.")
+    } else {
+        println("❌ No backup file found. Rollback failed.")
+    }
+}
+
 // Retrieve the latest Git tag or default to "v0.0.0"
 val latestTag = runCommand("git describe --tags --abbrev=0") ?: "v0.0.0"
 
@@ -35,7 +61,7 @@ val gitPatch = tagVersion.getOrNull(2)?.toIntOrNull() ?: 0
 // Get short Git commit hash
 val gitCommitHash = runCommand("git rev-parse --short HEAD") ?: "unknown"
 
-// Load version.properties file or create it if missing
+// Load version.properties or create if missing
 val versionFile = File(VERSION_FILE)
 val properties = Properties().apply {
     if (versionFile.exists()) {
@@ -48,6 +74,9 @@ val properties = Properties().apply {
         setProperty(BUILD_KEY, "0")
     }
 }
+
+// Perform backup before updating
+backupVersion()
 
 // Increment version numbers
 val major = properties.getProperty(MAJOR_KEY, gitMajor.toString()).toInt()
