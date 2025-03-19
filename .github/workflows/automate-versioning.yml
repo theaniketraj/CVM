@@ -82,12 +82,21 @@ jobs:
       # - name: 🔥 Run Version Increment Script
         # run: kotlin -script scripts/incrementVersion.kts
 
+      - name: 🛠️ Debug GH_PAT existence
+        run: |
+          if [ -z "${{ secrets.GH_PAT }}" ]; then
+            echo "GH_PAT is empty or not set!"
+            exit 1
+          else
+            echo "GH_PAT is set."
+          fi
+
       - name: 🚀 Configure Git
         run: |
           git config --local user.email "github-actions[bot]@users.noreply.github.com"
           git config --local user.name "GitHub Actions Bot"
           # Set remote URL with PAT
-          git remote set-url origin https://theaniketraj:{{ secrets.GH_PAT }}@github.com/theaniketraj/CVM.git
+          git remote set-url origin https://theaniketraj:${{ secrets.GH_PAT }}@github.com/theaniketraj/CVM.git
           git remote -v
 
       # - name: 📌 Tag and Push Version
