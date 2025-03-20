@@ -1,28 +1,9 @@
-// Test comment
-
-// #!/usr/bin/env kotlin
+#!/usr/bin/env kotlin
 
 import java.io.File
 import java.util.Properties
 
-val versionFile = File("version.properties")
-val backupFile = File("version_backup.properties")
-
-// Check if version.properties exists before proceeding
-if (!versionFile.exists()) {
-    println("🚨 version.properties file is missing! Exiting...")
-    System.exit(1)
-}
-
-// Create a backup before making any changes
-try {
-    versionFile.copyTo(backupFile, overwrite = true)
-    println("✅ Backup created: ${backupFile.absolutePath}")
-} catch (e: Exception) {
-    println("❌ ERROR: Failed to create backup. Exiting...")
-    System.exit(1)
-}
-
+// Constants for property keys and filenames
 val VERSION_FILE = "version.properties"
 val BACKUP_FILE = "version_backup.properties"
 val MAJOR_KEY = "VERSION_MAJOR"
@@ -30,7 +11,37 @@ val MINOR_KEY = "VERSION_MINOR"
 val PATCH_KEY = "VERSION_PATCH"
 val BUILD_KEY = "BUILD_NUMBER"
 
-// Function to run shell commands and return output
+// Create File objects once
+val versionFile = File(VERSION_FILE)
+val backupFile = File(BACKUP_FILE)
+
+// Ensure version.properties exists; if not, exit.
+if (!versionFile.exists()) {
+    println("🚨 ERROR: $VERSION_FILE not found. Exiting...")
+    System.exit(1)
+}
+
+// Create a backup before making changes
+try {
+    versionFile.copyTo(backupFile, overwrite = true)
+    println("✅ Backup created at: ${backupFile.absolutePath}")
+} catch (e: Exception) {
+    println("❌ ERROR: Failed to create backup. Exiting...")
+    System.exit(1)
+}
+
+// Load properties from version.properties
+val properties = Properties()
+versionFile.inputStream().use { properties.load(it) }
+
+// Retrieve current version values; use defaults if missing
+val currentMajor = properties.getProperty(MAJOR_KEY, "0").toIntOrNull() ?: 0
+val currentMinor = properties.getProperty(MINOR_KEY, "0").toIntOrNull() ?: 0
+val currentPatch = properties.getProperty(PATCH_KEY, "0").toIntOrNull() ?: 0
+val currentBuild = properties.getProperty(BUILD_KEY, "0").toIntOrNull() ?: 0
+val newBuild = currentBuild + 1
+
+// Helper function to run shell commands
 fun runCommand(command: String): String? {
     return try {
         val process = ProcessBuilder(*command.split(" ").toTypedArray())
@@ -43,96 +54,31 @@ fun runCommand(command: String): String? {
     }
 }
 
-// Backup the current version before updating
-fun backupVersion() {
-    val versionFile = File(VERSION_FILE)
-    val backupFile = File(BACKUP_FILE)
-
-    if (versionFile.exists()) {
-        versionFile.copyTo(backupFile, overwrite = true)
-        println("✅ Backup created: $BACKUP_FILE")
-    } else {
-        println("⚠️ No version.properties file found to backup.")
-    }
-}
-
-// Restore the previous version in case of rollback
-// fun rollbackVersion() {
-//     val backupFile = File("version_backup.properties")
-//     val versionFile = File("version.properties")
-
-//     if (!backupFile.exists()) {
-//         println("⚠️ No backup file found. Cannot rollback!")
-//         return
-//     }
-
-//     backupFile.copyTo(versionFile, overwrite = true)
-//     println("🔄 Rollback successful: Restored previous version")
-// }
-
-fun rollbackChanges() {
-    val backupFile = File("version_backup.properties")
-    val versionFile = File("version.properties")
-
-    if (!backupFile.exists()) {
-        println("⚠️ ERROR: No backup file found! Rollback not possible.")
-        return
-    }
-
-    try {
-        backupFile.copyTo(versionFile, overwrite = true)
-        println("🔄 Rollback successful: Previous version restored.")
-    } catch (e: Exception) {
-        println("❌ ERROR: Failed to restore backup!")
-        e.printStackTrace()
-    }
-}
-
-// Retrieve the latest Git tag or default to "v0.0.0"
+// Retrieve latest Git tag and commit hash
 val latestTag = runCommand("git describe --tags --abbrev=0") ?: "v0.0.0"
-
-// Parse Git tag into version components
-val tagVersion = latestTag.removePrefix("v").split(".")
-val gitMajor = tagVersion.getOrNull(0)?.toIntOrNull() ?: 0
-val gitMinor = tagVersion.getOrNull(1)?.toIntOrNull() ?: 0
-val gitPatch = tagVersion.getOrNull(2)?.toIntOrNull() ?: 0
-
-// Get short Git commit hash
+val tagComponents = latestTag.removePrefix("v").split(".")
+val gitMajor = tagComponents.getOrNull(0)?.toIntOrNull() ?: 0
+val gitMinor = tagComponents.getOrNull(1)?.toIntOrNull() ?: 0
+val gitPatch = tagComponents.getOrNull(2)?.toIntOrNull() ?: 0
 val gitCommitHash = runCommand("git rev-parse --short HEAD") ?: "unknown"
 
-// Load version.properties or create if missing
-val versionFile = File(VERSION_FILE)
-val properties = Properties().apply {
-    if (versionFile.exists()) {
-        load(versionFile.inputStream())
-    } else {
-        println("⚠️ version.properties not found. Creating a new one.")
-        setProperty(MAJOR_KEY, gitMajor.toString())
-        setProperty(MINOR_KEY, gitMinor.toString())
-        setProperty(PATCH_KEY, gitPatch.toString())
-        setProperty(BUILD_KEY, "0")
-    }
+// Decide final version numbers (fallback to Git values if current ones are 0)
+val finalMajor = if (currentMajor == 0) gitMajor else currentMajor
+val finalMinor = if (currentMinor == 0) gitMinor else currentMinor
+val finalPatch = if (currentPatch == 0) gitPatch else currentPatch
+
+// Generate new version string: MAJOR.MINOR.PATCH+build-GitHash
+val newVersion = "$finalMajor.$finalMinor.$finalPatch+$newBuild-$gitCommitHash"
+
+// Update properties with new values
+properties.setProperty(MAJOR_KEY, finalMajor.toString())
+properties.setProperty(MINOR_KEY, finalMinor.toString())
+properties.setProperty(PATCH_KEY, finalPatch.toString())
+properties.setProperty(BUILD_KEY, newBuild.toString())
+
+// Write updated properties back to version.properties
+versionFile.writer().use { writer ->
+    properties.store(writer, null)
 }
-
-// Perform backup before updating
-backupVersion()
-
-// Increment version numbers
-val major = properties.getProperty(MAJOR_KEY, gitMajor.toString()).toInt()
-val minor = properties.getProperty(MINOR_KEY, gitMinor.toString()).toInt()
-val patch = properties.getProperty(PATCH_KEY, gitPatch.toString()).toInt()
-val buildNumber = properties.getProperty(BUILD_KEY, "0").toInt() + 1
-
-// Generate the new version string with Git hash
-val newVersion = "$major.$minor.$patch+$buildNumber-$gitCommitHash"
-
-// Update properties
-properties[MAJOR_KEY] = major.toString()
-properties[MINOR_KEY] = minor.toString()
-properties[PATCH_KEY] = patch.toString()
-properties[BUILD_KEY] = buildNumber.toString()
-
-// Write updated values back to the version.properties file
-versionFile.writer().use { properties.store(it, null) }
 
 println("✅ Version updated to: $newVersion (Git hash: $gitCommitHash)")
