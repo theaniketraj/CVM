@@ -82,3 +82,7 @@ Contributions are welcome! If you'd like to contribute improvements or fixes:
 **License**
 
 This project is licensed under the [MIT License](https://github.com/theaniketraj/CVM/blob/main/LICENSE)
+
+**Note**
+
+This project is being deprecated. Will soon rebuild CVM from scratch.
