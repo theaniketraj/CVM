@@ -83,6 +83,6 @@ Contributions are welcome! If you'd like to contribute improvements or fixes:
 
 This project is licensed under the [MIT License](https://github.com/theaniketraj/CVM/blob/main/LICENSE)
 
-**Note**
+## Note
 
-This project is being deprecated. Check [VISTA](https://github.com/theaniketraj/VISTA) for an updated release.
+- This project is being deprecated. Check [VISTA](https://github.com/theaniketraj/VISTA) for an updated release.
