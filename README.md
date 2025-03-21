@@ -85,4 +85,4 @@ This project is licensed under the [MIT License](https://github.com/theaniketraj
 
 **Note**
 
-This project is being deprecated. Will soon rebuild CVM from scratch.
+This project is being deprecated. Check [VISTA](https://github.com/theaniketraj/VISTA) for an updated release.
